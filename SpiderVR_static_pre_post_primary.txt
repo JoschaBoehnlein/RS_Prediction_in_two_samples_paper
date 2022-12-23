@@ -1,0 +1,50 @@
+                            
+# -------------------- GENERATED WITH PHOTON WIZARD (beta) ------------------------------
+# PHOTON Project Folder: /spm-data/Scratch/photon_wizard/lstumpe/larapraepostprimaryoutcome20211204
+
+import pandas as pd
+import numpy as np
+from photonai.base import Hyperpipe, PipelineElement, OutputSettings, Switch, Preprocessing
+from photonai.optimization import Categorical, IntegerRange, FloatRange
+from sklearn.model_selection import StratifiedKFold    
+             
+# Specify how results are going to be saved
+output_settings = OutputSettings(mongodb_connect_url="mongodb://trap-umbriel:27017/photon_results",                                                                  
+                             user_id="lstumpe",
+                             wizard_object_id="61ab49ee3a1ec5e74757c360",
+                             wizard_project_name="larapraepostprimaryoutcome20211204")
+                    
+# Define hyperpipe
+hyperpipe = Hyperpipe('larapraepostprimaryoutcome20211204',
+                      project_folder = '/spm-data/Scratch/photon_wizard/lstumpe/larapraepostprimaryoutcome20211204',
+                      optimizer="grid_search",
+                      optimizer_params={},
+                      metrics=['accuracy', 'precision', 'balanced_accuracy', 'sensitivity', 'specificity', 'f1_score'],
+                      best_config_metric="balanced_accuracy",
+                      outer_cv = StratifiedKFold(n_splits=10,shuffle=True),
+                      inner_cv = StratifiedKFold(n_splits=10, shuffle=True),
+                      output_settings=output_settings)
+        
+# Add transformer elements
+hyperpipe += PipelineElement("ImbalancedDataTransformer", hyperparameters={'method_name': ['RandomUnderSampler', 'SMOTE']}, 
+                             test_disabled=True)
+hyperpipe += PipelineElement("StandardScaler", hyperparameters={}, 
+                             test_disabled=True, with_mean=True, with_std=True)
+hyperpipe += PipelineElement("PCA", hyperparameters={}, 
+                             test_disabled=True, n_components=None)
+hyperpipe += PipelineElement("FClassifSelectPercentile", hyperparameters={'percentile': [5, 10, 50]}, 
+                             test_disabled=True)
+# Add estimator
+estimator_switch = Switch('EstimatorSwitch')
+estimator_switch += PipelineElement("SVC", hyperparameters={'C': [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000], 'kernel': ['linear', 'rbf']}, gamma='scale', max_iter=1000000)
+estimator_switch += PipelineElement("RandomForestClassifier", hyperparameters={'max_depth': [2, 4, 6, 8, 10]}, n_estimators=100, criterion='gini', min_samples_split=2, min_samples_leaf=1)
+hyperpipe += estimator_switch                
+
+# Load data
+df = pd.read_excel('/spm-data/Scratch/photon_wizard/lstumpe/larapraepostprimaryoutcome20211204/A_RS_DATA_filter_Lara_prae_post.xlsx')
+X = np.asarray(df.iloc[:, 4:6674])
+y = np.asarray(df.iloc[:, 0])
+
+# Fit hyperpipe
+hyperpipe.fit(X, y)
+                        

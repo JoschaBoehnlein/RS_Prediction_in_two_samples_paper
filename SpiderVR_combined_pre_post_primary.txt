@@ -1,0 +1,70 @@
+import pandas as pd
+import numpy as np
+from photonai.base import Hyperpipe, PipelineElement, Stack, Branch, OutputSettings, Switch, DataFilter, Preprocessing
+from photonai.optimization import Categorical, IntegerRange, FloatRange
+from sklearn.model_selection import StratifiedKFold, KFold
+import scipy.io
+from tqdm import tqdm
+
+# Load data
+df = pd.read_excel ('P:/user/j_boeh06/Sciebo/Forschung/Artikel 4 RS und ML/Combined_Data/Combined_Data_20220812.xlsx')
+X = np.asarray()
+y = np.asarray(df.iloc[:, 6])
+debug=True
+# "Primary Outcome Prae Post is at Index 6
+# sRS-Daten are at Index 19 to 6688
+# clinical Daten are at Index 6689 to 6782
+
+# Specify how results are going to be saved
+output_settings = OutputSettings(mongodb_connect_url="mongodb://trap-umbriel:27017/photon_results",
+                                 user_id="jboehnlein",
+                                 wizard_object_id="61aa1091f50f99b33d57c3de", 
+                                 wizard_project_name="combined_sRS_clinical_pre_post_primary20220826")
+
+# Define hyperpipe
+hyperpipe = Hyperpipe('combined_sRS_clinical_pre_post_primary20220826',
+                      project_folder = 'P:/user/j_boeh06/Sciebo/Forschung/Artikel 4 RS und ML/Combined_Data',
+                      optimizer="grid_search",
+                      optimizer_params={},
+                      metrics=['accuracy', 'precision', 'balanced_accuracy', 'sensitivity', 'specificity', 'f1_score'],
+                      best_config_metric="balanced_accuracy",
+                      outer_cv=KFold(n_splits=10, shuffle=True),
+                      inner_cv=KFold(n_splits=10, shuffle=True),
+                      output_settings=output_settings,
+                      verbosity=1)
+
+# sRS Branch
+sRS_branch = Branch('sRS_data')
+sRS_branch += DataFilter(indices=range(19,6688))
+sRS_branch += PipelineElement("PCA", hyperparameters={},
+                             test_disabled=False, n_components=None)
+sRS_branch += PipelineElement("ImbalancedDataTransformer",
+                             hyperparameters={'method_name': ['RandomUnderSampler', 'SMOTE']},
+                             test_disabled=True)
+debug=True
+
+# Clinical Branch
+clinical_branch = Branch('clinical_data')
+clinical_branch += DataFilter(indices=range(6689,6782))
+clincal_branch += PipelineElement("PCA", hyperparameters={},
+                             test_disabled=False, n_components=None)
+clinical_branch += PipelineElement("ImbalancedDataTransformer",
+                             hyperparameters={'method_name': ['RandomUnderSampler', 'SMOTE']},
+                             test_disabled=True)
+debug=True
+
+
+#Combine the two branches
+hyperpipe += Stack('SourceStack', [clinical_data, sRS_data])
+
+# Add estimator (estimating over both data sources)
+estimator_switch = Switch('EstimatorSwitch')
+estimator_switch += PipelineElement ("SVC", hyperparameters={'C': [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000], 'kernel': ['linear', 'rbf']}, gamma='scale', max_iter=1000000)
+estimator_switch += PipelineElement ("RandomForestClassifier", hyperparameters={'n_estimators':[100], max_depth: [2, 4, 6, 8, 10]}, min_samples_split=2, min_samples_leaf=1, criterion='gini')
+hyperpipe += estimator_switch
+
+# Fit hyperpipe
+hyperpipe.fit(X, y)
+
+
+
