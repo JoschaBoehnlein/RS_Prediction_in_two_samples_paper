@@ -29,6 +29,7 @@ from sklearn.calibration import calibration_curve
 from sklearn import set_config
 from multiprocessing import Pool
 from sklearn.metrics import roc_curve, auc
+from imblearn.over_sampling import RandomOverSampler
 import time
 
 
@@ -85,37 +86,12 @@ def prepare_data(numrun):
                 features_import, labels_import, stratify=None, test_size=OPTIONS_OVERALL['test_size_option'], random_state=random_state_seed)
         
         #Oversampling train data
-        number_occurences = y_train['nonresponse'].value_counts()
-        X_train_concat = pd.concat([X_train, y_train], axis=1)
-        class_1 = X_train_concat[X_train_concat.nonresponse==1]
-        class_2 = X_train_concat[X_train_concat.nonresponse==0]
-        if number_occurences[0] > number_occurences[1]:
-            class_1_upsampled = resample(class_1, replace=True, n_samples=number_occurences[0], random_state=random_state_seed)
-            class_1_2_combined = pd.concat([class_1_upsampled, class_2])
-        elif number_occurences[1] > number_occurences[0]:
-            class_2_upsampled = resample(class_2, replace=True, n_samples=number_occurences[1], random_state=random_state_seed)
-            class_1_2_combined = pd.concat([class_1, class_2_upsampled])
-        elif number_occurences[0] == number_occurences[1]:
-            class_1_2_combined = pd.concat([class_1, class_2])
-        y_train = class_1_2_combined.nonresponse
-        X_train = class_1_2_combined.drop('nonresponse', axis=1)
+        ros_train = RandomOverSampler(random_state=random_state_seed)
+        X_train, y_train = ros_train.fit_resample(X_train, y_train)
 
         #Oversampling test data
-        number_occurences = y_test['nonresponse'].value_counts()
-        X_test_concat = pd.concat([X_test, y_test], axis=1)
-        class_1_test = X_test_concat[X_test_concat.nonresponse==1]
-        class_2_test = X_test_concat[X_test_concat.nonresponse==0]
-        if number_occurences[0] > number_occurences[1]:
-            class_1_upsampled_test = resample(class_1_test, replace=True, n_samples=number_occurences[0], random_state=random_state_seed)
-            class_1_2_combined_test = pd.concat([class_1_upsampled_test, class_2_test])
-        elif number_occurences[1] > number_occurences[0]:
-            class_2_upsampled_test = resample(class_2_test, replace=True, n_samples=number_occurences[1], random_state=random_state_seed)
-            class_1_2_combined_test = pd.concat([class_1_test, class_2_upsampled_test])
-        elif number_occurences[0] == number_occurences[1]:
-            class_1_2_combined_test = pd.concat([class_1_test, class_2_test])
-        y_test = class_1_2_combined_test.nonresponse
-        X_test = class_1_2_combined_test.drop('nonresponse', axis=1)
-
+        ros_test = RandomOverSampler(random_state=random_state_seed)
+        X_test, y_test = ros_test.fit_resample(X_test, y_test)
 
         y_train= np.array(y_train)
         y_test= np.array(y_test)
