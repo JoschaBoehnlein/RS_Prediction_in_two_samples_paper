@@ -293,9 +293,8 @@ def result_metrics_binary(y_prediction_result_metrics_binary, clf_result_metrics
     counter_class2_correct = 0
     counter_class1_incorrect = 0
     counter_class2_incorrect = 0
-    y_test_result_metrics_binary = y_prediction_result_metrics_binary[:,1]
 
-    for i in range(len(y_test_result_metrics_binary)):
+    for i in range(len(y_prediction_result_metrics_binary[:,1])):
         if y_prediction_result_metrics_binary[i,1] == y_prediction_result_metrics_binary[i,0]:
             y_prediction_result_metrics_binary[i,2] = 1
             if y_prediction_result_metrics_binary[i,1] == 1:
@@ -314,13 +313,13 @@ def result_metrics_binary(y_prediction_result_metrics_binary, clf_result_metrics
     accuracy_class2 = counter_class2_correct / (counter_class2_correct + counter_class2_incorrect)
     balanced_accuracy = (accuracy_class1 + accuracy_class2) / 2
     oob_accuracy = clf_result_metrics_binary.oob_score_
-    log_loss_value = log_loss(y_test_result_metrics_binary, clf_result_metrics_binary.predict_proba(X_test_scaled_imputed_selected_result_metrics_binary), normalize=True)
+    log_loss_value = log_loss(y_prediction_result_metrics_binary[:,1], clf_result_metrics_binary.predict_proba(X_test_scaled_imputed_selected_result_metrics_binary), normalize=True)
 
     fpr, tpr, thresholds = roc_curve(y_prediction_result_metrics_binary[:,1], clf_result_metrics_binary.predict_proba(X_test_scaled_imputed_selected_result_metrics_binary)[:,1])
     mean_fpr = np.linspace(0, 1, 100)
     tprs = np.interp(mean_fpr, fpr, tpr)
     roc_auc = auc(fpr, tpr)
-    fraction_positives, mean_predicted_value = calibration_curve(y_test_result_metrics_binary, clf_result_metrics_binary.predict_proba(X_test_scaled_imputed_selected_result_metrics_binary)[:,1], n_bins=10)
+    fraction_positives, mean_predicted_value = calibration_curve(y_prediction_result_metrics_binary[:,1], clf_result_metrics_binary.predict_proba(X_test_scaled_imputed_selected_result_metrics_binary)[:,1], n_bins=10)
 
     return accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, mean_fpr, tprs, roc_auc, fraction_positives, mean_predicted_value
 
