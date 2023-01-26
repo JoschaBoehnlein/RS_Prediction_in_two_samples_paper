@@ -44,7 +44,7 @@ mkl.set_num_threads(1)
 
 PATH_WORKINGDIRECTORY = '/home/hilbertk/prediction_protectad/'
 OPTIONS_OVERALL = {'name_model': 'PROTECTAD_RF_ROIS_code_review_CM_KH'}
-OPTIONS_OVERALL['number_iterations'] = 2
+OPTIONS_OVERALL['number_iterations'] = 100
 OPTIONS_OVERALL['name_features'] = ['d_feat_demo.txt','d_feat_conn.txt','d_feat_graph.txt']
 OPTIONS_OVERALL['abbreviations_features'] = ['_feat_demo','_feat_conn','_feat_graph','_majority_voting','_softmax_voting','_softmax_by_oob','meta_learner_2nd_lvl_logreg','meta_learner_2nd_lvl_RF']
 OPTIONS_OVERALL['name_labels'] = 'd_labels.txt'
