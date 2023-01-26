@@ -243,7 +243,7 @@ def do_iterations(numrun):
             feature_importances[number_features] = 0
 
     
-    accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, mean_fpr, tprs, roc_auc, fraction_positives, mean_predicted_value = result_metrics_binary(y_prediction, clf, X_test_scaled_imputed_selected)
+    accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, tprs, roc_auc, fraction_positives, mean_predicted_value = result_metrics_binary(y_prediction, clf, X_test_scaled_imputed_selected)
 
     
     print(OPTIONS_OVERALL['abbreviations_features'][current_model])
@@ -322,7 +322,7 @@ def result_metrics_binary(y_prediction_result_metrics_binary, clf_result_metrics
     roc_auc = auc(fpr, tpr)
     fraction_positives, mean_predicted_value = calibration_curve(y_test_result_metrics_binary, clf_result_metrics_binary.predict_proba(X_test_scaled_imputed_selected_result_metrics_binary)[:,1], n_bins=10)
 
-    return accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, mean_fpr, tprs, roc_auc, fraction_positives, mean_predicted_value
+    return accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, tprs, roc_auc, fraction_positives, mean_predicted_value
 
 
 def save_scores(accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, feature_importances, fpr, tpr, tprs, roc_auc, fraction_positives, mean_predicted_value):
