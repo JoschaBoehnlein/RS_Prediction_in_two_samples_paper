@@ -91,14 +91,6 @@ def prepare_data(numrun):
         X_train = np.array(X_train)
         X_test = np.array(X_test)  
         
-        #Int to iterable
-        yyy=np.zeros((len(y_train),1))
-        yyy[:,0]= np.array(y_train)
-        y_train=yyy
-        yyy_test=np.zeros((len(y_test),1))
-        yyy_test[:,0]= np.array(y_test)
-        y_test=yyy_test
-
         save_cv_option_features_train = OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][model] + '_save_cv_fold_' + str (random_state_seed) + '_features_train.txt'
         save_cv_option_features_test = OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][model] + '_save_cv_fold_' + str (random_state_seed) + '_features_test.txt'
         save_cv_option_labels_train = OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][model] + '_save_cv_fold_' + str (random_state_seed) + '_labels_train.txt'
@@ -213,10 +205,6 @@ def do_iterations(numrun):
 
     
     accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, tprs, roc_auc, fraction_positives, mean_predicted_value = result_metrics_binary(y_pred = y_prediction[:,0], y_true = y_prediction[:,1], y_prob = meta_learner_input[:,2], fitted_clf = clf)
-
-    
-    print(OPTIONS_OVERALL['abbreviations_features'][current_model])
-    print(current_model)
     
     save_cv_option_meta_learner_input = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][current_model] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
     with open(save_cv_option_meta_learner_input, 'w', newline='') as file:
@@ -558,7 +546,6 @@ def aggregate_scores(accuracy, accuracy_class1, accuracy_class2, balanced_accura
     mean_fpr = np.linspace(0, 1, 100)
     tprs[-1][0] = 0.0
     mean_tpr = np.mean(tprs, axis=0)
-    print(mean_tpr)
     mean_tpr[0] = 0
     mean_tpr[-1] = 1.0
     mean_auc = auc(mean_fpr, mean_tpr)
@@ -573,7 +560,6 @@ def meta_learner_majority_voting(numrun):
 
     global PATH_WORKINGDIRECTORY, OPTIONS_OVERALL
 
-    print(numrun)
     random_state_seed = numrun
 
 
@@ -594,7 +580,6 @@ def meta_learner_majority_voting(numrun):
     vote_majority = np.zeros((len(meta_learner_inputs_demo), 1))
     vote_majority_proba = np.zeros((len(meta_learner_inputs_demo), 1))
     vote_majority_proba_2 = np.zeros((len(meta_learner_inputs_demo), 1))
-    vote_majority_result = np.zeros((len(meta_learner_inputs_demo), 1))
 
     meta_learner_inputs_demo= np.array(meta_learner_inputs_demo)
     meta_learner_inputs_conn= np.array(meta_learner_inputs_conn)
@@ -620,8 +605,7 @@ def meta_learner_majority_voting(numrun):
 def meta_learner_softmax_voting(numrun):
 
     global PATH_WORKINGDIRECTORY, OPTIONS_OVERALL
-
-    print(numrun)
+    
     random_state_seed = numrun
 
 
@@ -642,7 +626,6 @@ def meta_learner_softmax_voting(numrun):
     vote_softmax_raw = np.zeros((len(meta_learner_inputs_demo), 1))
     vote_softmax_raw_2 = np.zeros((len(meta_learner_inputs_demo), 1))
     vote_softmax = np.zeros((len(meta_learner_inputs_demo), 1))
-    vote_softmax_result = np.zeros((len(meta_learner_inputs_demo), 1))
 
                           
     meta_learner_inputs_demo= np.array(meta_learner_inputs_demo)
@@ -671,7 +654,6 @@ def meta_learner_Softmax_by_oob(numrun):
 
     global PATH_WORKINGDIRECTORY, OPTIONS_OVERALL
 
-    print(numrun)
     random_state_seed = numrun
 
     """
@@ -706,7 +688,6 @@ def meta_learner_Softmax_by_oob(numrun):
     threshold = np.zeros((len(meta_learner_inputs_demo), 1))
     vote_softmax_raw_2 = np.zeros((len(meta_learner_inputs_demo), 1))
     vote_softmax = np.zeros((len(meta_learner_inputs_demo), 1))
-    vote_softmax_result = np.zeros((len(meta_learner_inputs_demo), 1))
 
 
     meta_learner_inputs_demo= np.array(meta_learner_inputs_demo)
@@ -736,7 +717,6 @@ def meta_learner_2nd_level_logreg(numrun):
 
     global PATH_WORKINGDIRECTORY, OPTIONS_OVERALL
 
-    print(numrun)
     random_state_seed = numrun
 
 
@@ -803,7 +783,6 @@ def meta_learner_2nd_level_RF(numrun):
 
     global PATH_WORKINGDIRECTORY, OPTIONS_OVERALL
 
-    print(numrun)
     random_state_seed = numrun
 
 
