@@ -297,8 +297,6 @@ def result_metrics_binary(y_pred, y_true, y_prob, fitted_clf = None):
 def save_scores(accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, feature_importances, fpr, tpr, tprs, roc_auc, fraction_positives, mean_predicted_value):
 
     global PATH_WORKINGDIRECTORY, OPTIONS_OVERALL
-    
-    # Wenn die result_metrics in einem dictionary gespeichert wären, wäre eine kompaktere Darstellung möglich (loop über dictionary)
 
     load_cv_option_cur_model =   os.path.join(PATH_WORKINGDIRECTORY,'metalearner_input', 'current_model.txt')
     with open(load_cv_option_cur_model, "rb") as input_file:
@@ -489,12 +487,8 @@ def aggregate_scores(accuracy, accuracy_class1, accuracy_class2, balanced_accura
 
     plt.close('all')
     
-    # Plot calibration curve
-    # Warum wird hier nicht len(mean_predicted_value) genommen, sondern len(fraction_positives)?
-    # PULL REQUEST: bitte umsetzen
-    # das wäre dann = np.zeros((len(mean_predicted_value))) , richtig?
-    min_mean_predicted_value = np.zeros((len(fraction_positives)))
-    max_mean_predicted_value = np.zeros((len(fraction_positives)))
+    min_mean_predicted_value = np.zeros((len(mean_predicted_value)))
+    max_mean_predicted_value = np.zeros((len(mean_predicted_value)))
     
     for j in range(len(fraction_positives)):
         min_mean_predicted_value[j] = min(mean_predicted_value[j])
@@ -723,24 +717,22 @@ def meta_learner_2nd_level_logreg(numrun):
     """
     "Import Inputs
     """
-    full_path_cv_option_features_train_demo = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
-    meta_learner_inputs_demo = read_csv(full_path_cv_option_features_train_demo, sep="\s", header=None, engine='python')
+    full_path_cv_option_features_test_demo = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
+    meta_learner_inputs_demo = read_csv(full_path_cv_option_features_test_demo, sep="\s", header=None, engine='python')
 
-    full_path_cv_option_features_train_conn = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][1] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
-    meta_learner_inputs_conn = read_csv(full_path_cv_option_features_train_conn, sep="\s", header=None, engine='python')
+    full_path_cv_option_features_test_conn = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][1] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
+    meta_learner_inputs_conn = read_csv(full_path_cv_option_features_test_conn, sep="\s", header=None, engine='python')
 
-    full_path_cv_option_features_train_graph = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][2] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
-    meta_learner_inputs_graph = read_csv(full_path_cv_option_features_train_graph, sep="\s", header=None, engine='python')
+    full_path_cv_option_features_test_graph = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][2] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
+    meta_learner_inputs_graph = read_csv(full_path_cv_option_features_test_graph, sep="\s", header=None, engine='python')
     
-    # Ich fände es gut, wenn die Pfade für die untersch. Daten auch untersch. Namen hätten (z.B. _train_demo vs. _test_demo)
-    # Sonst ist es sehr verwirrend (siehe auch nächster Metalearner)
     full_path_cv_option_features_train_demo = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
     meta_learner_input_train_demo = read_csv(full_path_cv_option_features_train_demo, sep="\s", header=None, engine='python')
 
-    full_path_cv_option_features_train_conn = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
+    full_path_cv_option_features_train_conn = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][1] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
     meta_learner_input_train_conn = read_csv(full_path_cv_option_features_train_conn, sep="\s", header=None, engine='python')
 
-    full_path_cv_option_features_train_graph = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
+    full_path_cv_option_features_train_graph = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][2] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
     meta_learner_input_train_graph = read_csv(full_path_cv_option_features_train_graph, sep="\s", header=None, engine='python')
 
 
@@ -790,22 +782,22 @@ def meta_learner_2nd_level_RF(numrun):
     "Import Inputs
     """
 
-    full_path_cv_option_features_train_demo = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
-    meta_learner_inputs_demo = read_csv(full_path_cv_option_features_train_demo, sep="\s", header=None, engine='python')
+    full_path_cv_option_features_test_demo = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
+    meta_learner_inputs_demo = read_csv(full_path_cv_option_features_test_demo, sep="\s", header=None, engine='python')
 
-    full_path_cv_option_features_train_conn = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][1] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
-    meta_learner_inputs_conn = read_csv(full_path_cv_option_features_train_conn, sep="\s", header=None, engine='python')
+    full_path_cv_option_features_test_conn = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][1] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
+    meta_learner_inputs_conn = read_csv(full_path_cv_option_features_test_conn, sep="\s", header=None, engine='python')
 
-    full_path_cv_option_features_train_graph = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][2] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
-    meta_learner_inputs_graph = read_csv(full_path_cv_option_features_train_graph, sep="\s", header=None, engine='python')
+    full_path_cv_option_features_test_graph = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][2] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
+    meta_learner_inputs_graph = read_csv(full_path_cv_option_features_test_graph, sep="\s", header=None, engine='python')
 
     full_path_cv_option_features_train_demo = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
     meta_learner_input_train_demo = read_csv(full_path_cv_option_features_train_demo, sep="\s", header=None, engine='python')
 
-    full_path_cv_option_features_train_conn = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
+    full_path_cv_option_features_train_conn = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][1] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
     meta_learner_input_train_conn = read_csv(full_path_cv_option_features_train_conn, sep="\s", header=None, engine='python')
 
-    full_path_cv_option_features_train_graph = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][0] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
+    full_path_cv_option_features_train_graph = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][2] + '_save_cv_fold_' + str (random_state_seed) + '_train_predictions.txt')
     meta_learner_input_train_graph = read_csv(full_path_cv_option_features_train_graph, sep="\s", header=None, engine='python')
 
 
