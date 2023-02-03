@@ -204,7 +204,7 @@ def do_iterations(numrun):
             feature_importances[number_features] = 0
 
     
-    accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, tprs, roc_auc, fraction_positives, mean_predicted_value = result_metrics_binary(y_pred = y_prediction[:,0], y_true = y_prediction[:,1], y_prob = meta_learner_input[:,2], fitted_clf = clf)
+    accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, tprs, roc_auc, fraction_positives, mean_predicted_value = result_metrics_binary(y_pred = y_prediction[:,0], y_true = y_prediction[:,1], y_prob = meta_learner_input[:,3], fitted_clf = clf)
     
     save_cv_option_meta_learner_input = os.path.join(PATH_WORKINGDIRECTORY, 'metalearner_input', OPTIONS_OVERALL['name_model'] + OPTIONS_OVERALL['abbreviations_features'][current_model] + '_save_cv_fold_' + str (random_state_seed) + '_predictions.txt')
     with open(save_cv_option_meta_learner_input, 'w', newline='') as file:
@@ -633,7 +633,7 @@ def meta_learner_softmax_voting(numrun):
     for z in range(len(meta_learner_inputs_demo)):
         vote_softmax_raw[z] = meta_learner_inputs_demo[z,2] + meta_learner_inputs_conn[z,2] + meta_learner_inputs_graph[z,2]
         vote_softmax_raw_2[z] = (meta_learner_inputs_demo[z,3] + meta_learner_inputs_conn[z,3] + meta_learner_inputs_graph[z,3])/3
-        if vote_softmax_raw[z] > 1.5:
+        if vote_softmax_raw[z] < 1.5:
             vote_softmax[z] = 1
         else:
             vote_softmax[z] = 0
@@ -696,7 +696,7 @@ def meta_learner_Softmax_by_oob(numrun):
         vote_softmax_raw[z] = meta_learner_inputs_demo[z,2]*oob_demo + meta_learner_inputs_conn[z,2]*oob_conn + meta_learner_inputs_graph[z,2]*oob_graph
         threshold[z] = 0.5*oob_demo + 0.5*oob_conn + 0.5*oob_graph
         vote_softmax_raw_2[z] = (meta_learner_inputs_demo[z,3]*oob_demo + meta_learner_inputs_conn[z,3]*oob_conn + meta_learner_inputs_graph[z,3]*oob_graph)/(threshold[z]*2)
-        if vote_softmax_raw[z] > threshold[z]:
+        if vote_softmax_raw[z] < threshold[z]:
             vote_softmax[z] = 1
         else:
             vote_softmax[z] = 0
