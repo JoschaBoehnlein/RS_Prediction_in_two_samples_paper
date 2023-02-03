@@ -282,13 +282,13 @@ def result_metrics_binary(y_pred, y_true, y_prob, fitted_clf = None):
             oob_accuracy = fitted_clf.oob_score_
         except:
             oob_accuracy = float("nan")
-        log_loss_value = log_loss(y_pred, y_prob, normalize=True)
+        log_loss_value = log_loss(y_true, y_prob, normalize=True)
         
-    fpr, tpr, thresholds = roc_curve(y_pred, y_prob)
+    fpr, tpr, thresholds = roc_curve(y_true, y_prob)
     mean_fpr = np.linspace(0, 1, 100)
     tprs = np.interp(mean_fpr, fpr, tpr)
     roc_auc = auc(fpr, tpr)
-    fraction_positives, mean_predicted_value = calibration_curve(y_pred, y_prob, n_bins=10)
+    fraction_positives, mean_predicted_value = calibration_curve(y_true, y_prob, n_bins=10)
     
    
     return accuracy, accuracy_class1, accuracy_class2, balanced_accuracy, oob_accuracy, log_loss_value, fpr, tpr, thresholds, tprs, roc_auc, fraction_positives, mean_predicted_value
