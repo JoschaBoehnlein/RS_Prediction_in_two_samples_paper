@@ -166,7 +166,7 @@ def do_iterations(numrun):
     X_test_scaled_imputed_selected = sfm.transform(X_test_imputed_scaled)
 
 
-    # Random Forrest Analyse
+    # Random Forest Analyse
 
     clf = RandomForestClassifier(n_estimators= 1000, criterion = 'gini', max_features= 'auto', max_depth= None, min_samples_split= 2, min_samples_leaf= 1, bootstrap= True, oob_score=True, random_state=random_state_seed)
     clf = clf.fit(X_train_imputed_scaled_selected, y_train)
